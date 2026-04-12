@@ -16,6 +16,7 @@ import { useFileUpload } from './FileUploadContext'
 import { useQuizSettings } from './settings/settingsStorage'
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { ChatSidebar } from './ChatSidebar'
 import Link from 'next/link'
 
 interface Question {
@@ -80,13 +81,16 @@ export default function QuizDashboard() {
     
     // Parse PDFs
     const parsedContents = await Promise.all(files.map(async (file) => {
+      const formData = new FormData();
+      formData.append('file', file.file);
+
       const response = await fetch('/api/parsePdf', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileUrl: file.url })
+        body: formData
       })
       if (!response.ok) {
-        throw new Error(`Failed to parse PDF: ${file.name}`)
+        const parseError = await response.json().catch(() => ({}));
+        throw new Error(parseError?.error || `Failed to parse PDF: ${file.name}`)
       }
       const result = await response.json()
       return result.content
@@ -111,7 +115,8 @@ export default function QuizDashboard() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to generate quiz')
+        const generationError = await response.json().catch(() => ({}));
+        throw new Error(generationError?.error || 'Failed to generate quiz')
       }
 
       const generatedQuiz = await response.json()
@@ -122,7 +127,7 @@ export default function QuizDashboard() {
       console.error('Error generating quiz:', error)
       toast({
         title: "Error",
-        description: "Failed to generate quiz. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to generate quiz. Please try again.",
         variant: "destructive",
       })
       setQuizState('upload')
@@ -440,6 +445,7 @@ export default function QuizDashboard() {
           </Button>
         </DialogContent>
       </Dialog>
+      <ChatSidebar pdfContext={files.length > 0 ? `Uploaded documents: ${files.map(f => f.name).join(', ')}` : undefined} />
     </div>
   )
 }

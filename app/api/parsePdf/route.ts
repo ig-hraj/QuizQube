@@ -2,16 +2,6 @@ import { auth } from "@/auth"
 import { NextResponse } from "next/server"
 import normalizeText from '../../lib/normalizeText'
 import pdfParse from 'pdf-parse'
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3"
-import { Readable } from 'stream'
-
-const s3Client = new S3Client({
-  region: process.env.AWS_REGION!,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-});
 
 export const POST = auth(async function POST(req) {
   if (!req.auth) {
@@ -19,36 +9,15 @@ export const POST = auth(async function POST(req) {
   }
 
   try {
-    const { fileUrl } = await req.json();
+    const formData = await req.formData();
+    const file = formData.get('file');
 
-    if (!fileUrl) {
-      return NextResponse.json({ error: 'No file URL provided' }, { status: 400 });
+    if (!(file instanceof File)) {
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    // Parse the S3 URL to get bucket and key
-    const url = new URL(fileUrl);
-    const bucket = url.hostname.split('.')[0];
-    // decodeURIComponent to handle special characters in the key
-    const key = url.pathname.slice(1).split('/').map(decodeURIComponent).join('/');
-
-    // Fetch the file from S3
-    const command = new GetObjectCommand({
-      Bucket: bucket,
-      Key: key,
-    });
-
-    const { Body } = await s3Client.send(command);
-
-    if (!Body) {
-      throw new Error('Failed to fetch file from S3');
-    }
-
-    // Convert the readable stream to a buffer
-    const chunks: Uint8Array[] = [];
-    for await (const chunk of Body as Readable) {
-      chunks.push(chunk);
-    }
-    const buffer = Buffer.concat(chunks);
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
     // Parse the PDF
     const pdfData = await pdfParse(buffer);

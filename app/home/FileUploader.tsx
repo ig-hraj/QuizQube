@@ -62,52 +62,25 @@ export default function FileUploader({ onUploadComplete }: FileUploaderProps) {
     );
 
     try {
-      const response = await fetch('/api/getPresignedUrl', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileName: fileStatus.file.name, fileType: fileStatus.file.type }),
+      // Local mode: no cloud upload. We create an object URL and simulate upload progress.
+      for (const progress of [25, 50, 75, 100]) {
+        await new Promise((resolve) => setTimeout(resolve, 120));
+        setFileStatuses(prevFiles => prevFiles.map(f =>
+          f.file === fileStatus.file ? { ...f, progress } : f
+        ));
+      }
+
+      const fileUrl = URL.createObjectURL(fileStatus.file);
+      setFileStatuses(prevFiles => prevFiles.map(f =>
+        f.file === fileStatus.file ? { ...f, status: 'completed', url: fileUrl, progress: 100 } : f
+      ));
+      addFile({ url: fileUrl, name: fileStatus.file.name, size: fileStatus.file.size, file: fileStatus.file });
+      onUploadComplete(fileUrl, fileStatus.file.name, fileStatus.file.size);
+      toast({
+        title: "File ready",
+        description: `${fileStatus.file.name} is ready for quiz generation.`,
+        variant: "default",
       });
-
-      if (!response.ok) throw new Error('Failed to get pre-signed URL');
-
-      const { uploadUrl, key } = await response.json();
-
-      const xhr = new XMLHttpRequest();
-      xhr.open('PUT', uploadUrl);
-      xhr.setRequestHeader('Content-Type', fileStatus.file.type);
-
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const percentComplete = (event.loaded / event.total) * 100;
-          setFileStatuses(prevFiles => prevFiles.map(f => 
-            f.file === fileStatus.file ? { ...f, progress: percentComplete } : f
-          ));
-        }
-      };
-
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          const fileUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${key}`;
-          setFileStatuses(prevFiles => prevFiles.map(f => 
-            f.file === fileStatus.file ? { ...f, status: 'completed', url: fileUrl, progress: 100 } : f
-          ));
-          addFile({ url: fileUrl, name: fileStatus.file.name, size: fileStatus.file.size });
-          onUploadComplete(fileUrl, fileStatus.file.name, fileStatus.file.size);
-          toast({
-            title: "Upload successful",
-            description: `${fileStatus.file.name} has been uploaded successfully.`,
-            variant: "default",
-          });
-        } else {
-          throw new Error('Upload failed');
-        }
-      };
-
-      xhr.onerror = () => {
-        throw new Error('Upload failed');
-      };
-
-      xhr.send(fileStatus.file);
     } catch (error) {
       console.error('Error uploading file:', error);
       setFileStatuses(prevFiles => prevFiles.map(f => 

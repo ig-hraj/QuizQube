@@ -25,7 +25,7 @@ QuizQube is an AI-powered quiz platform that helps you learn and test your knowl
 - [Shadcn UI](https://ui.shadcn.com/) - Re-usable components built with Radix UI and Tailwind CSS
 - [Framer Motion](https://www.framer.com/motion/) - Animation library for React
 - [NextAuth.js](https://next-auth.js.org/) - Authentication for Next.js
-- [AWS S3](https://aws.amazon.com/s3/) - Cloud storage for uploaded documents
+- [Groq](https://console.groq.com/) - LLM provider used for quiz and chat generation
 - [Lucide React](https://lucide.dev/) - Icon library
 
 ## Getting Started
@@ -35,7 +35,21 @@ QuizQube is an AI-powered quiz platform that helps you learn and test your knowl
 3. Set up environment variables (see `.env.example`)
 4. Run the development server: `npm run dev`
 5. Open [http://localhost:3000](http://localhost:3000) in your browser
-6. Grab an API key from [Groq](https://console.groq.com/api-keys) and set it in the settings page
+6. Sign in with GitHub
+7. Grab an API key from [Groq](https://console.groq.com/api-keys) and set it in the Settings page
+
+### Environment Variables
+
+Copy `.env.example` to `.env` and fill in:
+
+- `AUTH_GITHUB_ID`
+- `AUTH_GITHUB_SECRET`
+- `NEXTAUTH_SECRET`
+
+### Notes
+
+- PDF processing runs locally in the app (no AWS setup required).
+- Groq API key is entered in-app from the Settings page and stored in browser local storage.
 
 
 ## Learning Outcomes

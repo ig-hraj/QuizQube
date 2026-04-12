@@ -5,6 +5,7 @@ import { ViewTransitions } from 'next-view-transitions'
 import { Toaster } from "@/components/ui/toaster"
 import { UserStatsProvider } from './UserStatsContext';
 import { FileUploadProvider } from './FileUploadContext';
+import { ChatProvider } from './ChatContext';
 
 import "../globals.css";
 import Navbar from "@/components/Navbar";
@@ -29,13 +30,15 @@ export default async function RootLayout({
       <ViewTransitions>
         <FileUploadProvider>
           <UserStatsProvider>
-            <html lang="en">
-              <body className={`${ubuntu.className} antialiased bg-gray-100 h-screen`}>
-                <Navbar />
-                {children}
-                <Toaster />
-              </body>
-            </html>
+            <ChatProvider>
+              <html lang="en">
+                <body className={`${ubuntu.className} antialiased bg-gray-100 h-screen`}>
+                  <Navbar />
+                  {children}
+                  <Toaster />
+                </body>
+              </html>
+            </ChatProvider>
           </UserStatsProvider>
         </FileUploadProvider>
       </ViewTransitions>

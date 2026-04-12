@@ -31,6 +31,11 @@ function sanitizeJSON(jsonString: string): string {
   return match ? match[0] : '{}';
 }
 
+function truncateContentForModel(content: string, maxChars: number): string {
+  if (content.length <= maxChars) return content;
+  return `${content.slice(0, maxChars)}\n\n[Content truncated to fit model token limits]`;
+}
+
 function validateAndFixQuizData(data: RawQuizData, expectedCount: number, typeOfQuiz: string): QuizData {
   const fixedData: QuizData = {
     topic: typeof data.topic === 'string' ? data.topic : 'Untitled Quiz',
@@ -94,25 +99,48 @@ export const POST = auth(async function POST(req) {
 
   try {
     const groq = new Groq({ apiKey: apiKey });
-    const prompt = getQuizPrompt(typeOfQuiz, {
-      questionCount: Number(questionCount),
-      difficulty,
-      content
-    });
+    const contentBudgets = [12000, 8000, 5000];
+    let completion;
+    let lastError: unknown;
 
-    const completion = await groq.chat.completions.create({
-      model: "mixtral-8x7b-32768",
-      messages: [
-        {
-          role: "system",
-          content: "You are an expert quiz generator. Your responses must be in valid JSON format only, with no additional text. You must strictly adhere to the specified number of questions and quiz type.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    });
+    for (const budget of contentBudgets) {
+      try {
+        const prompt = getQuizPrompt(typeOfQuiz, {
+          questionCount: Number(questionCount),
+          difficulty,
+          content: truncateContentForModel(content, budget)
+        });
+
+        completion = await groq.chat.completions.create({
+          model: "llama-3.1-8b-instant",
+          messages: [
+            {
+              role: "system",
+              content: "You are an expert quiz generator. Your responses must be in valid JSON format only, with no additional text. You must strictly adhere to the specified number of questions and quiz type.",
+            },
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+        });
+
+        break;
+      } catch (error) {
+        lastError = error;
+        const message = error instanceof Error ? error.message : String(error);
+        const isTokenError = message.includes('Request too large') || message.includes('tokens') || message.includes('TPM');
+        if (!isTokenError) {
+          throw error;
+        }
+      }
+    }
+
+    if (!completion) {
+      throw lastError instanceof Error
+        ? new Error('Input is too large for your current Groq tier. Try fewer PDFs or shorter documents.')
+        : new Error('Input is too large for your current Groq tier. Try fewer PDFs or shorter documents.');
+    }
 
     const sanitizedJSON = sanitizeJSON(completion.choices[0].message.content || '{}');
     let quizData: RawQuizData;
@@ -158,5 +186,6 @@ function isValidContent(content: unknown): content is string {
 }
 
 function isValidApiKey(apiKey: unknown): apiKey is string {
-  return typeof apiKey === 'string' && apiKey.startsWith('gsk_') && apiKey.length === 56;
+  // Groq key length can vary, so validate prefix and a sane minimum length.
+  return typeof apiKey === 'string' && apiKey.startsWith('gsk_') && apiKey.length >= 20;
 }

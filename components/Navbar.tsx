@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Menu, LogOut, Settings } from "lucide-react"
+import { Menu, LogOut, Settings, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Link, useTransitionRouter } from 'next-view-transitions'
@@ -62,6 +62,10 @@ const Navbar: React.FC = () => {
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => router.push('/home/chat')}>
+                                <MessageCircle className="mr-2 h-4 w-4" />
+                                <span>Chat (Academic)</span>
+                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => router.push('/home/settings')}>
                                 <Settings className="mr-2 h-4 w-4" />
                                 <span>Settings</span>
