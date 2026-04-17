@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
-import { Ubuntu } from 'next/font/google';
+import { Ubuntu } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
-import { ViewTransitions } from 'next-view-transitions'
+import { ViewTransitions } from "next-view-transitions";
 
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "QuizQube",
-  description: "QuizQube is an AI-powered quiz platform that helps you learn and test your knowledge.",
+  description:
+    "QuizQube is an AI-powered quiz platform that helps you learn and test your knowledge.",
   openGraph: {
-    images: ["https://quizqube.eljakani.me/quizqube_featured.png"],
+    images: ["/quizqube_featured.png"], // ✅ fixed
   },
 };
 
 const ubuntu = Ubuntu({
-  subsets: ['latin'],
+  subsets: ["latin"],
   weight: ["300", "400", "500", "700"],
 });
 
@@ -24,13 +25,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider afterSignInUrl="/home" afterSignUpUrl="/home">
       <ViewTransitions>
-      <html lang="en">
-        <body className={`${ubuntu.className} antialiased bg-gray-100`}>
-          {children}
-        </body>
-      </html>
+        <html lang="en">
+          <body className={`${ubuntu.className} antialiased bg-gray-100`}>
+            {children}
+          </body>
+        </html>
       </ViewTransitions>
     </ClerkProvider>
   );
