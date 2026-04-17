@@ -1,17 +1,18 @@
 'use client';
 
 import React from 'react';
-import { Menu, MessageCircle, Settings } from "lucide-react"
+import { Menu, MessageCircle, Settings, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Link, useTransitionRouter } from 'next-view-transitions'
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { UserButton, useUser } from '@clerk/nextjs'
+import { useUser, useClerk } from '@clerk/nextjs'
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 
 const Navbar: React.FC = () => {
     const { user } = useUser();
+    const { signOut } = useClerk();
     const router = useTransitionRouter()
 
     return (
@@ -46,15 +47,10 @@ const Navbar: React.FC = () => {
                     </div>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                                <UserButton 
-                                    afterSignOutUrl="/"
-                                    appearance={{
-                                        elements: {
-                                            avatarBox: "w-8 h-8",
-                                        }
-                                    }}
-                                />
+                            <Button variant="ghost" size="icon" className="rounded-full">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
+                                    {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                                </div>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -72,6 +68,11 @@ const Navbar: React.FC = () => {
                             <DropdownMenuItem onClick={() => router.push('/home/settings')}>
                                 <Settings className="mr-2 h-4 w-4" />
                                 <span>Settings</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => signOut({ redirectUrl: '/' })}>
+                                <LogOut className="mr-2 h-4 w-4" />
+                                <span>Logout</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
