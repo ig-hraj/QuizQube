@@ -11,13 +11,13 @@ import {
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useSession } from "next-auth/react"
+import { useUser } from "@clerk/nextjs"
 import { useQuizSettings } from './settingsStorage'
 import { Skeleton } from "@/components/ui/skeleton" 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 export default function Settings() {
-    const { data: session } = useSession()
+    const { user } = useUser()
     const { settings, updateSetting } = useQuizSettings();
 
     if (!settings) {

@@ -3,11 +3,11 @@ import { Card, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Brain, Star, Trophy } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { useUser } from '@clerk/nextjs';
 import { useUserStats } from './UserStatsContext';
 
 const HeaderCard: React.FC = () => {
-  const { data: session } = useSession();
+  const { user } = useUser();
   const { stats } = useUserStats();
 
   return (
@@ -15,12 +15,12 @@ const HeaderCard: React.FC = () => {
         <div className="flex items-center justify-between mb-4 gap-4">
           <div className="flex items-center space-x-4">
             <Avatar className="h-12 w-12 border-2 border-primary">
-              <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || "User"} />
-              <AvatarFallback>{session?.user?.name?.[0] || 'U'}</AvatarFallback>
+              <AvatarImage src={user?.imageUrl || ""} alt={user?.fullName || "User"} />
+              <AvatarFallback>{user?.firstName?.[0] || 'U'}</AvatarFallback>
             </Avatar>
             <div>
               <CardTitle className="text-3xl">
-                Hi {session?.user?.name}
+                Hi {user?.firstName}
                 <span className='animate-waving-hand'>
                   👋
                 </span>

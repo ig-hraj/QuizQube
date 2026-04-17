@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Ubuntu } from 'next/font/google';
-import { SessionProvider } from "next-auth/react";
+import { ClerkProvider } from "@clerk/nextjs";
 import { ViewTransitions } from 'next-view-transitions'
 
 import "./globals.css";
@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SessionProvider>
+    <ClerkProvider>
       <ViewTransitions>
       <html lang="en">
         <body className={`${ubuntu.className} antialiased bg-gray-100`}>
@@ -32,6 +32,6 @@ export default function RootLayout({
         </body>
       </html>
       </ViewTransitions>
-    </SessionProvider>
+    </ClerkProvider>
   );
 }

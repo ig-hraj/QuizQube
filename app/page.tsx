@@ -1,7 +1,7 @@
 'use client';
 import HomeCard from "@/components/card";
 import { motion } from "framer-motion";
-import { signIn, useSession } from "next-auth/react";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useTransitionRouter } from 'next-view-transitions'
 import Image from "next/image";
@@ -29,7 +29,8 @@ const TestIcon = () => (
 );
 
 export default function Home() {
-  const { data: session } = useSession();
+  const { user } = useUser();
+  const { redirectToSignIn } = useClerk();
   const cards = [
     {
       step: 1,
@@ -122,13 +123,13 @@ export default function Home() {
         >
          <button 
             className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-full transition duration-300 flex items-center justify-center space-x-2"
-            onClick={() => session ? goHome() : signIn("github",{ redirectTo: "/home" })}
+            onClick={() => user ? goHome() : redirectToSignIn()}
           >
-            {session ? (
+            {user ? (
               <>
               <Avatar className="w-6 h-6">
-                <AvatarImage src={session.user?.image || "#"} alt="User Avatar" />
-                <AvatarFallback>{session.user?.name?.[0] || 'U'}</AvatarFallback>
+                <AvatarImage src={user.imageUrl || "#"} alt="User Avatar" />
+                <AvatarFallback>{user.firstName?.[0] || 'U'}</AvatarFallback>
               </Avatar>
               <span>Go to Dashboard</span>
               </>

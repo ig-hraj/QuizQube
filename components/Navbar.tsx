@@ -1,18 +1,17 @@
 'use client';
 
 import React from 'react';
-import { Menu, LogOut, Settings, MessageCircle } from "lucide-react"
+import { Menu, MessageCircle, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Link, useTransitionRouter } from 'next-view-transitions'
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { useSession, signOut } from 'next-auth/react'
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { UserButton, useUser } from '@clerk/nextjs'
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 
 const Navbar: React.FC = () => {
-    const { data: session } = useSession();
+    const { user } = useUser();
     const router = useTransitionRouter()
 
     return (
@@ -48,17 +47,21 @@ const Navbar: React.FC = () => {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                                <Avatar className="h-8 w-8">
-                                    <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || "User"} />
-                                    <AvatarFallback>{session?.user?.name?.[0] || 'U'}</AvatarFallback>
-                                </Avatar>
+                                <UserButton 
+                                    afterSignOutUrl="/"
+                                    appearance={{
+                                        elements: {
+                                            avatarBox: "w-8 h-8",
+                                        }
+                                    }}
+                                />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-56" align="end" forceMount>
                             <DropdownMenuLabel className="font-normal">
                                 <div className="flex flex-col space-y-1">
-                                    <p className="text-sm font-medium leading-none">{session?.user?.name}</p>
-                                    <p className="text-xs leading-none text-muted-foreground">{session?.user?.email}</p>
+                                    <p className="text-sm font-medium leading-none">{user?.firstName} {user?.lastName}</p>
+                                    <p className="text-xs leading-none text-muted-foreground">{user?.primaryEmailAddress?.emailAddress}</p>
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
@@ -69,11 +72,6 @@ const Navbar: React.FC = () => {
                             <DropdownMenuItem onClick={() => router.push('/home/settings')}>
                                 <Settings className="mr-2 h-4 w-4" />
                                 <span>Settings</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => signOut()}>
-                                <LogOut className="mr-2 h-4 w-4" />
-                                <span>Log out</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
