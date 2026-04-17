@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster"
 import { UserStatsProvider } from './UserStatsContext';
 import { FileUploadProvider } from './FileUploadContext';
 import { ChatProvider } from './ChatContext';
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 import "../globals.css";
 import Navbar from "@/components/Navbar";
@@ -24,6 +26,13 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Server-side authentication check
+  const { userId } = auth();
+  
+  if (!userId) {
+    redirect("/sign-in");
+  }
+
   return (
     <ViewTransitions>
       <FileUploadProvider>
