@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider fallbackRedirectUrl="/home" signInFallbackRedirectUrl="/home" signUpFallbackRedirectUrl="/home">
       <ViewTransitions>
       <html lang="en">
         <body className={`${ubuntu.className} antialiased bg-gray-100`}>
