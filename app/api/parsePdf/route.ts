@@ -1,10 +1,12 @@
-import { auth } from "@/auth"
+import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import normalizeText from '../../lib/normalizeText'
 import pdfParse from 'pdf-parse'
 
-export const POST = auth(async function POST(req) {
-  if (!req.auth) {
+export async function POST(req: Request) {
+  const { userId } = auth();
+  
+  if (!userId) {
     return NextResponse.json({ message: "Not authenticated" }, { status: 401 })
   }
 
@@ -30,4 +32,4 @@ export const POST = auth(async function POST(req) {
       error: `Failed to parse PDF: ${error instanceof Error ? error.message : 'Unknown error'}` 
     }, { status: 500 });
   }
-})
+}

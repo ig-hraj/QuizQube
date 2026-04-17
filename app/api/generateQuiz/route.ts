@@ -1,4 +1,4 @@
-import { auth } from "@/auth"
+import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import Groq from "groq-sdk"
 import { parse as jsonParse } from 'json5';
@@ -65,8 +65,10 @@ function validateAndFixQuizData(data: RawQuizData, expectedCount: number, typeOf
   return fixedData;
 }
 
-export const POST = auth(async function POST(req) {
-  if (!req.auth) {
+export async function POST(req: Request) {
+  const { userId } = auth();
+  
+  if (!userId) {
     return NextResponse.json({ message: "Not authenticated" }, { status: 401 })
   }
 
@@ -166,7 +168,7 @@ export const POST = auth(async function POST(req) {
     }
     return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
   }
-});
+}
 
 // Type guard functions
 function isValidQuizType(type: unknown): type is QuizType {

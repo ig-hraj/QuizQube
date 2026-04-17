@@ -60,17 +60,17 @@ export default function Settings() {
                 <CardContent>
                   <div className="flex flex-col items-center space-y-4 sm:flex-row sm:space-x-6 sm:space-y-0">
                     <Avatar className="h-24 w-24">
-                      <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || "User"} />
-                      <AvatarFallback>{session?.user?.name?.[0] || 'U'}</AvatarFallback>
+                      <AvatarImage src={user?.imageUrl || ""} alt={user?.fullName || "User"} />
+                      <AvatarFallback>{user?.firstName?.[0] || 'U'}</AvatarFallback>
                     </Avatar>
                     <div className="space-y-2">
                       <div>
                         <Label className="text-sm font-medium text-muted-foreground">Full Name</Label>
-                        <p className="text-lg font-semibold">{session?.user?.name}</p>
+                        <p className="text-lg font-semibold">{user?.fullName}</p>
                       </div>
                       <div>
                         <Label className="text-sm font-medium text-muted-foreground">Email</Label>
-                        <p className="text-lg font-semibold">{session?.user?.email}</p>
+                        <p className="text-lg font-semibold">{user?.emailAddresses?.[0]?.emailAddress}</p>
                       </div>
                     </div>
                   </div>

@@ -1,9 +1,11 @@
-import { auth } from "@/auth"
+import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import Groq from "groq-sdk"
 
-export const POST = auth(async function POST(req) {
-  if (!req.auth) {
+export async function POST(req: Request) {
+  const { userId } = auth();
+  
+  if (!userId) {
     return NextResponse.json({ message: "Not authenticated" }, { status: 401 })
   }
 
@@ -84,4 +86,4 @@ When answering:
     }
     return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
   }
-});
+}
