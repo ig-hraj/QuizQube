@@ -147,7 +147,7 @@ export default function Home() {
         variants={fadeUpVariants}
         transition={{ duration: 0.5, delay: 1.2 }}
       >
-        Built with <span className="inline-block hover:scale-125 hover:rotate-12 transition-transform duration-300 ease-in-out cursor-default">❤️</span> by <span className="font-semibold">Pragya</span> using <a href="https://groq.com" target="_blank" rel="noopener noreferrer" className="font-semibold text-main hover:underline cursor-pointer">Groq</a> & <a href="https://ai.meta.com/llama/" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#0079C1] hover:underline cursor-pointer">Llama3.1</a>
+        Built with <span className="inline-block hover:scale-125 hover:rotate-12 transition-transform duration-300 ease-in-out cursor-default">❤️</span> by <span className="font-semibold">Harsh</span> using <a href="https://groq.com" target="_blank" rel="noopener noreferrer" className="font-semibold text-main hover:underline cursor-pointer">Groq</a> & <a href="https://ai.meta.com/llama/" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#0079C1] hover:underline cursor-pointer">Llama3.1</a>
       </motion.footer>
     </div>
   );

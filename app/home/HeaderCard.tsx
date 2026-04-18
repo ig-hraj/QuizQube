@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpen, Brain, Trophy } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { BookOpen, Brain, Trophy, Star } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useUserStats } from './UserStatsContext';
 
@@ -27,6 +28,14 @@ const HeaderCard: React.FC = () => {
               <CardDescription>Welcome back to QuizQube!</CardDescription>
             </div>
           </div>
+          <Button 
+            variant="outline" 
+            className="bg-foreground hover:bg-background/80 text-background transition-all duration-300 ease-in-out"
+            onClick={() => window.open('https://github.com/ig-hraj/QuizQube', '_blank')}
+          >
+            <Star className="h-5 w-5 mr-1" />
+            Star us on GitHub
+          </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           <StatItem 
